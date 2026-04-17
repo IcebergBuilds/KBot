@@ -342,24 +342,15 @@
   </header>
 
   <div class="card">
-    <!-- Server URL -->
-    <div class="field">
-      <label>Server URL</label>
-      <div class="server-row">
-        <input type="text" id="serverUrl" placeholder="https://your-tunnel.trycloudflare.com" />
-        <button class="btn-sm" onclick="saveServer()">Save</button>
-      </div>
-    </div>
-
     <!-- Game PIN -->
     <div class="field">
       <label>Game PIN</label>
       <input type="number" id="gamePin" placeholder="e.g. 123456" min="1" max="9999999"/>
     </div>
 
-    <!-- Nickname base -->
+    <!-- Nickname -->
     <div class="field">
-      <label>Nickname Base</label>
+      <label>Nickname</label>
       <input type="text" id="nickname" placeholder='e.g. "Bot" → Bot 1, Bot 2 …' maxlength="16"/>
     </div>
 
@@ -367,8 +358,8 @@
     <div class="field">
       <label>Number of Bots — <span id="countLabel">5</span></label>
       <div class="range-row">
-        <input type="range" id="botCount" min="1" max="20" value="5"
-               oninput="document.getElementById('countLabel').textContent=this.value"/>
+        <input type="range" id="botCount" min="1" max="100" value="5"
+               oninput="document.getElementById('countLabel').textContent=this.value;document.getElementById('rangeDisplay').textContent=this.value"/>
         <span class="range-val" id="rangeDisplay">5</span>
       </div>
     </div>
@@ -393,19 +384,13 @@
 </div>
 
 <script>
+  // Hardcoded server URL
+  const SERVER_URL = 'https://dedicator-cloak-doorbell.ngrok-free.dev';
+
   // Sync range display
   const range = document.getElementById('botCount');
   const rangeDisplay = document.getElementById('rangeDisplay');
   range.addEventListener('input', () => rangeDisplay.textContent = range.value);
-
-  // Load saved server URL
-  const savedUrl = localStorage.getItem('kbot_server');
-  if (savedUrl) document.getElementById('serverUrl').value = savedUrl;
-
-  function saveServer() {
-    localStorage.setItem('kbot_server', document.getElementById('serverUrl').value.trim());
-    log('Server URL saved.', 'ok');
-  }
 
   // Logging
   function log(msg, type = 'info') {
@@ -451,7 +436,7 @@
     if (!sessionId) return;
     const server = document.getElementById('serverUrl').value.trim();
     try {
-      await fetch(`${server}/stop`, {
+      await fetch(`${SERVER_URL}/stop`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sessionId })
@@ -465,20 +450,18 @@
   }
 
   async function launch() {
-    const server = document.getElementById('serverUrl').value.trim();
     const pin    = document.getElementById('gamePin').value.trim();
     const name   = document.getElementById('nickname').value.trim();
     const count  = parseInt(document.getElementById('botCount').value);
 
-    if (!server) { log('Please enter your server URL.', 'err'); return; }
     if (!pin)    { log('Please enter a game PIN.', 'err'); return; }
-    if (!name)   { log('Please enter a nickname base.', 'err'); return; }
+    if (!name)   { log('Please enter a nickname.', 'err'); return; }
 
     document.getElementById('launchBtn').disabled = true;
     log(`Connecting to server…`, 'info');
 
     try {
-      const res = await fetch(`${server}/launch`, {
+      const res = await fetch(`${SERVER_URL}/launch`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ pin, nickname: name, count })
