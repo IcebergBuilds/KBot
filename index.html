@@ -463,24 +463,33 @@
   // ── Failure polling ───────────────────────────────────────────────────────────
 
   function startPolling(id) {
-    stopPolling();
-    pollInterval = setInterval(async () => {
-      try {
-        const res = await fetch(`${SERVER_URL}/status/${id}`);
-        const data = await res.json();
+      stopPolling();
+      let seenLogs = 0; // track how many info logs we've already displayed
 
-        if (data.status === 'failed') {
-          stopPolling();
-          showFailure(data.reason || 'The job failed on the AHK side.');
-          endSession('failed');
-        } else if (data.status === 'completed') {
-          stopPolling();
-          endSession('completed');
-        }
-      } catch (_) {
-        // server unreachable mid-session, keep trying
-      }
-    }, 3000); // poll every 3 seconds
+      pollInterval = setInterval(async () => {
+          try {
+              const res = await fetch(`${SERVER_URL}/status/${id}`);
+              const data = await res.json();
+
+              // Show any new info logs
+              if (data.logs && data.logs.length > seenLogs) {
+                  const newLogs = data.logs.slice(seenLogs);
+                  newLogs.forEach(entry => log(entry.reason, 'info'));
+                  seenLogs = data.logs.length;
+              }
+
+              if (data.status === 'failed') {
+                  stopPolling();
+                  showFailure(data.reason || 'The job failed on the server side.');
+                  endSession('failed');
+              } else if (data.status === 'completed') {
+                  stopPolling();
+                  endSession('completed');
+              }
+          } catch (_) {
+              // server unreachable, keep trying
+          }
+      }, 3000);
   }
 
   function stopPolling() {
@@ -582,7 +591,7 @@
 
     } catch (e) {
       log(`Could not reach server: ${e.message}`, 'err');
-      log('Is the server running? Is the tunnel URL correct?', 'warn');
+      log('The server is not currently active. Come back later.', 'warn');
       document.getElementById('launchBtn').disabled = false;
     }
   }
