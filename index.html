@@ -434,7 +434,7 @@
 
   async function stopSession() {
     if (!sessionId) return;
-    const server = document.getElementById('serverUrl').value.trim();
+    
     try {
       await fetch(`${SERVER_URL}/stop`, {
         method: 'POST',
