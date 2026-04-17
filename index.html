@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>KBot</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0f;
+      --surface: #13131a;
+      --border: #2a2a3a;
+      --accent: #7c3aed;
+      --accent2: #06b6d4;
+      --text: #e8e8f0;
+      --muted: #6b6b80;
+      --success: #10b981;
+      --error: #ef4444;
+      --warn: #f59e0b;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      overflow-x: hidden;
+    }
+
+    /* Animated grid background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(124,58,237,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(124,58,237,0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(ellipse at 60% 40%, rgba(124,58,237,0.08) 0%, transparent 50%),
+                  radial-gradient(ellipse at 30% 70%, rgba(6,182,212,0.06) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+      animation: drift 20s ease-in-out infinite alternate;
+    }
+
+    @keyframes drift {
+      from { transform: translate(0, 0) rotate(0deg); }
+      to   { transform: translate(2%, 2%) rotate(1deg); }
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 480px;
+    }
+
+    header {
+      margin-bottom: 2.5rem;
+      text-align: center;
+    }
+
+    .logo {
+      font-family: 'Syne', sans-serif;
+      font-size: 2.8rem;
+      font-weight: 800;
+      letter-spacing: -2px;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1;
+      margin-bottom: 0.4rem;
+    }
+
+    .tagline {
+      color: var(--muted);
+      font-size: 0.75rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+    }
+
+    .field {
+      margin-bottom: 1.4rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.7rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+    }
+
+    input {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1rem;
+      padding: 0.75rem 1rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(124,58,237,0.15);
+    }
+
+    input::placeholder { color: var(--muted); }
+
+    /* Range slider */
+    .range-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    input[type=range] {
+      flex: 1;
+      padding: 0;
+      height: 4px;
+      -webkit-appearance: none;
+      background: var(--border);
+      border-radius: 99px;
+      border: none;
+      cursor: pointer;
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 8px rgba(124,58,237,0.5);
+      transition: box-shadow 0.2s;
+    }
+
+    input[type=range]::-webkit-slider-thumb:hover {
+      box-shadow: 0 0 14px rgba(124,58,237,0.8);
+    }
+
+    .range-val {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--accent2);
+      min-width: 2ch;
+      text-align: right;
+    }
+
+    /* Server URL field */
+    .server-row {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .server-row input { flex: 1; }
+
+    .btn-sm {
+      background: var(--border);
+      border: none;
+      border-radius: 8px;
+      color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      cursor: pointer;
+      padding: 0 0.75rem;
+      transition: background 0.2s, color 0.2s;
+      white-space: nowrap;
+    }
+
+    .btn-sm:hover { background: var(--accent); color: #fff; }
+
+    /* Submit button */
+    .btn-launch {
+      width: 100%;
+      padding: 0.9rem;
+      background: linear-gradient(135deg, var(--accent), #5b21b6);
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      margin-top: 0.5rem;
+      position: relative;
+      overflow: hidden;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+
+    .btn-launch:hover { opacity: 0.92; }
+    .btn-launch:active { transform: scale(0.98); }
+    .btn-launch:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .btn-launch .btn-text { position: relative; z-index: 1; }
+
+    /* Shimmer effect on button */
+    .btn-launch::after {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+      animation: shimmer 2.5s infinite;
+    }
+
+    @keyframes shimmer {
+      to { left: 200%; }
+    }
+
+    /* Status log */
+    .log-box {
+      margin-top: 1.5rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem;
+      max-height: 200px;
+      overflow-y: auto;
+      font-size: 0.78rem;
+      line-height: 1.8;
+      display: none;
+    }
+
+    .log-box.visible { display: block; }
+
+    .log-line { display: flex; gap: 0.6rem; }
+    .log-time { color: var(--muted); flex-shrink: 0; }
+    .log-msg.ok   { color: var(--success); }
+    .log-msg.err  { color: var(--error); }
+    .log-msg.info { color: var(--accent2); }
+    .log-msg.warn { color: var(--warn); }
+
+    /* Active session pill */
+    .session-bar {
+      display: none;
+      align-items: center;
+      gap: 0.75rem;
+      margin-top: 1.2rem;
+      padding: 0.65rem 1rem;
+      background: rgba(16,185,129,0.08);
+      border: 1px solid rgba(16,185,129,0.25);
+      border-radius: 8px;
+      font-size: 0.78rem;
+    }
+
+    .session-bar.visible { display: flex; }
+
+    .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--success);
+      box-shadow: 0 0 6px var(--success);
+      animation: pulse 1.4s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .session-text { color: var(--success); flex: 1; }
+    .session-timer { color: var(--muted); font-size: 0.7rem; }
+
+    .btn-stop {
+      background: rgba(239,68,68,0.15);
+      border: 1px solid rgba(239,68,68,0.3);
+      border-radius: 6px;
+      color: var(--error);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      padding: 0.25rem 0.6rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-stop:hover { background: rgba(239,68,68,0.3); }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.65rem;
+      letter-spacing: 1px;
+      margin-top: 1.5rem;
+      opacity: 0.6;
+    }
+
+    /* Scroll bar styling */
+    .log-box::-webkit-scrollbar { width: 4px; }
+    .log-box::-webkit-scrollbar-track { background: transparent; }
+    .log-box::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="logo">KBot</div>
+    <div class="tagline">Kahoot Bot Launcher</div>
+  </header>
+
+  <div class="card">
+    <!-- Server URL -->
+    <div class="field">
+      <label>Server URL</label>
+      <div class="server-row">
+        <input type="text" id="serverUrl" placeholder="https://your-tunnel.trycloudflare.com" />
+        <button class="btn-sm" onclick="saveServer()">Save</button>
+      </div>
+    </div>
+
+    <!-- Game PIN -->
+    <div class="field">
+      <label>Game PIN</label>
+      <input type="number" id="gamePin" placeholder="e.g. 123456" min="1" max="9999999"/>
+    </div>
+
+    <!-- Nickname base -->
+    <div class="field">
+      <label>Nickname Base</label>
+      <input type="text" id="nickname" placeholder='e.g. "Bot" → Bot 1, Bot 2 …' maxlength="16"/>
+    </div>
+
+    <!-- Bot count -->
+    <div class="field">
+      <label>Number of Bots — <span id="countLabel">5</span></label>
+      <div class="range-row">
+        <input type="range" id="botCount" min="1" max="20" value="5"
+               oninput="document.getElementById('countLabel').textContent=this.value"/>
+        <span class="range-val" id="rangeDisplay">5</span>
+      </div>
+    </div>
+
+    <button class="btn-launch" id="launchBtn" onclick="launch()">
+      <span class="btn-text">🚀 Launch Bots</span>
+    </button>
+
+    <!-- Session status -->
+    <div class="session-bar" id="sessionBar">
+      <div class="dot"></div>
+      <span class="session-text" id="sessionText">Bots active</span>
+      <span class="session-timer" id="sessionTimer">15:00</span>
+      <button class="btn-stop" onclick="stopSession()">Stop</button>
+    </div>
+
+    <!-- Log -->
+    <div class="log-box" id="logBox"></div>
+  </div>
+
+  <footer>kbot • for testing only • tabs auto-close after 15 min</footer>
+</div>
+
+<script>
+  // Sync range display
+  const range = document.getElementById('botCount');
+  const rangeDisplay = document.getElementById('rangeDisplay');
+  range.addEventListener('input', () => rangeDisplay.textContent = range.value);
+
+  // Load saved server URL
+  const savedUrl = localStorage.getItem('kbot_server');
+  if (savedUrl) document.getElementById('serverUrl').value = savedUrl;
+
+  function saveServer() {
+    localStorage.setItem('kbot_server', document.getElementById('serverUrl').value.trim());
+    log('Server URL saved.', 'ok');
+  }
+
+  // Logging
+  function log(msg, type = 'info') {
+    const box = document.getElementById('logBox');
+    box.classList.add('visible');
+    const now = new Date();
+    const t = now.toTimeString().slice(0,8);
+    const line = document.createElement('div');
+    line.className = 'log-line';
+    line.innerHTML = `<span class="log-time">${t}</span><span class="log-msg ${type}">${msg}</span>`;
+    box.appendChild(line);
+    box.scrollTop = box.scrollHeight;
+  }
+
+  // Session timer
+  let timerInterval = null;
+  let sessionId = null;
+
+  function startTimer(seconds) {
+    let remaining = seconds;
+    const el = document.getElementById('sessionTimer');
+    clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+      remaining--;
+      const m = String(Math.floor(remaining / 60)).padStart(2, '0');
+      const s = String(remaining % 60).padStart(2, '0');
+      el.textContent = `${m}:${s}`;
+      if (remaining <= 0) {
+        clearInterval(timerInterval);
+        endSession();
+      }
+    }, 1000);
+  }
+
+  function endSession() {
+    document.getElementById('sessionBar').classList.remove('visible');
+    document.getElementById('launchBtn').disabled = false;
+    sessionId = null;
+    log('Session ended — all tabs closed by server.', 'warn');
+  }
+
+  async function stopSession() {
+    if (!sessionId) return;
+    const server = document.getElementById('serverUrl').value.trim();
+    try {
+      await fetch(`${server}/stop`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId })
+      });
+      log('Stop request sent.', 'warn');
+    } catch(e) {
+      log('Could not reach server to stop.', 'err');
+    }
+    clearInterval(timerInterval);
+    endSession();
+  }
+
+  async function launch() {
+    const server = document.getElementById('serverUrl').value.trim();
+    const pin    = document.getElementById('gamePin').value.trim();
+    const name   = document.getElementById('nickname').value.trim();
+    const count  = parseInt(document.getElementById('botCount').value);
+
+    if (!server) { log('Please enter your server URL.', 'err'); return; }
+    if (!pin)    { log('Please enter a game PIN.', 'err'); return; }
+    if (!name)   { log('Please enter a nickname base.', 'err'); return; }
+
+    document.getElementById('launchBtn').disabled = true;
+    log(`Connecting to server…`, 'info');
+
+    try {
+      const res = await fetch(`${server}/launch`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin, nickname: name, count })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || data.error) {
+        log(`Server error: ${data.error || res.statusText}`, 'err');
+        document.getElementById('launchBtn').disabled = false;
+        return;
+      }
+
+      sessionId = data.sessionId;
+      log(`Session started: ${sessionId}`, 'ok');
+      log(`Launching ${count} bot(s) as "${name} 1" … "${name} ${count}"`, 'ok');
+
+      document.getElementById('sessionText').textContent =
+        `${count} bot(s) active as "${name} 1–${count}"`;
+      document.getElementById('sessionBar').classList.add('visible');
+      startTimer(data.durationSeconds || 900);
+
+    } catch(e) {
+      log(`Could not reach server: ${e.message}`, 'err');
+      log('Is the server running? Is the tunnel URL correct?', 'warn');
+      document.getElementById('launchBtn').disabled = false;
+    }
+  }
+</script>
+</body>
+</html>
