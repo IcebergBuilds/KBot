@@ -34,7 +34,6 @@
       overflow-x: hidden;
     }
 
-    /* Animated grid background */
     body::before {
       content: '';
       position: fixed;
@@ -113,11 +112,14 @@
       top: 0; left: 0; right: 0;
       height: 2px;
       background: linear-gradient(90deg, var(--accent), var(--accent2));
+      transition: background 0.4s;
     }
 
-    .field {
-      margin-bottom: 1.4rem;
+    .card.failed::before {
+      background: linear-gradient(90deg, var(--error), #b91c1c);
     }
+
+    .field { margin-bottom: 1.4rem; }
 
     label {
       display: block;
@@ -148,7 +150,6 @@
 
     input::placeholder { color: var(--muted); }
 
-    /* Range slider */
     .range-row {
       display: flex;
       align-items: center;
@@ -160,6 +161,7 @@
       padding: 0;
       height: 4px;
       -webkit-appearance: none;
+      appearance: none;
       background: var(--border);
       border-radius: 99px;
       border: none;
@@ -187,30 +189,6 @@
       text-align: right;
     }
 
-    /* Server URL field */
-    .server-row {
-      display: flex;
-      gap: 0.5rem;
-    }
-
-    .server-row input { flex: 1; }
-
-    .btn-sm {
-      background: var(--border);
-      border: none;
-      border-radius: 8px;
-      color: var(--muted);
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.7rem;
-      cursor: pointer;
-      padding: 0 0.75rem;
-      transition: background 0.2s, color 0.2s;
-      white-space: nowrap;
-    }
-
-    .btn-sm:hover { background: var(--accent); color: #fff; }
-
-    /* Submit button */
     .btn-launch {
       width: 100%;
       padding: 0.9rem;
@@ -233,10 +211,8 @@
     .btn-launch:hover { opacity: 0.92; }
     .btn-launch:active { transform: scale(0.98); }
     .btn-launch:disabled { opacity: 0.4; cursor: not-allowed; }
-
     .btn-launch .btn-text { position: relative; z-index: 1; }
 
-    /* Shimmer effect on button */
     .btn-launch::after {
       content: '';
       position: absolute;
@@ -246,11 +222,111 @@
       animation: shimmer 2.5s infinite;
     }
 
-    @keyframes shimmer {
-      to { left: 200%; }
+    @keyframes shimmer { to { left: 200%; } }
+
+    /* ── Session bar ── */
+    .session-bar {
+      display: none;
+      align-items: center;
+      gap: 0.75rem;
+      margin-top: 1.2rem;
+      padding: 0.65rem 1rem;
+      background: rgba(16,185,129,0.08);
+      border: 1px solid rgba(16,185,129,0.25);
+      border-radius: 8px;
+      font-size: 0.78rem;
+      transition: background 0.3s, border-color 0.3s;
     }
 
-    /* Status log */
+    .session-bar.visible { display: flex; }
+
+    .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--success);
+      box-shadow: 0 0 6px var(--success);
+      animation: pulse 1.4s ease-in-out infinite;
+      flex-shrink: 0;
+      transition: background 0.3s, box-shadow 0.3s;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .session-text { color: var(--success); flex: 1; transition: color 0.3s; }
+    .session-timer { color: var(--muted); font-size: 0.7rem; }
+
+    .btn-stop {
+      background: rgba(239,68,68,0.15);
+      border: 1px solid rgba(239,68,68,0.3);
+      border-radius: 6px;
+      color: var(--error);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      padding: 0.25rem 0.6rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-stop:hover { background: rgba(239,68,68,0.3); }
+
+    /* ── Failure banner ── */
+    .fail-bar {
+      display: none;
+      align-items: flex-start;
+      gap: 0.75rem;
+      margin-top: 1.2rem;
+      padding: 0.75rem 1rem;
+      background: rgba(239,68,68,0.08);
+      border: 1px solid rgba(239,68,68,0.3);
+      border-radius: 8px;
+      font-size: 0.78rem;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .fail-bar.visible { display: flex; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-4px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .fail-icon {
+      font-size: 1rem;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .fail-body { flex: 1; }
+    .fail-title {
+      color: var(--error);
+      font-weight: 600;
+      margin-bottom: 0.2rem;
+    }
+
+    .fail-reason {
+      color: var(--muted);
+      font-size: 0.7rem;
+      line-height: 1.5;
+    }
+
+    .btn-dismiss {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 1rem;
+      cursor: pointer;
+      padding: 0;
+      line-height: 1;
+      flex-shrink: 0;
+      transition: color 0.2s;
+    }
+
+    .btn-dismiss:hover { color: var(--error); }
+
+    /* ── Log ── */
     .log-box {
       margin-top: 1.5rem;
       background: var(--bg);
@@ -273,52 +349,6 @@
     .log-msg.info { color: var(--accent2); }
     .log-msg.warn { color: var(--warn); }
 
-    /* Active session pill */
-    .session-bar {
-      display: none;
-      align-items: center;
-      gap: 0.75rem;
-      margin-top: 1.2rem;
-      padding: 0.65rem 1rem;
-      background: rgba(16,185,129,0.08);
-      border: 1px solid rgba(16,185,129,0.25);
-      border-radius: 8px;
-      font-size: 0.78rem;
-    }
-
-    .session-bar.visible { display: flex; }
-
-    .dot {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      background: var(--success);
-      box-shadow: 0 0 6px var(--success);
-      animation: pulse 1.4s ease-in-out infinite;
-      flex-shrink: 0;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
-    }
-
-    .session-text { color: var(--success); flex: 1; }
-    .session-timer { color: var(--muted); font-size: 0.7rem; }
-
-    .btn-stop {
-      background: rgba(239,68,68,0.15);
-      border: 1px solid rgba(239,68,68,0.3);
-      border-radius: 6px;
-      color: var(--error);
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.7rem;
-      padding: 0.25rem 0.6rem;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-
-    .btn-stop:hover { background: rgba(239,68,68,0.3); }
-
     footer {
       text-align: center;
       color: var(--muted);
@@ -328,7 +358,6 @@
       opacity: 0.6;
     }
 
-    /* Scroll bar styling */
     .log-box::-webkit-scrollbar { width: 4px; }
     .log-box::-webkit-scrollbar-track { background: transparent; }
     .log-box::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
@@ -341,20 +370,17 @@
     <div class="tagline">Kahoot Bot Launcher</div>
   </header>
 
-  <div class="card">
-    <!-- Game PIN -->
+  <div class="card" id="card">
     <div class="field">
       <label>Game PIN</label>
       <input type="number" id="gamePin" placeholder="e.g. 123456" min="1" max="9999999"/>
     </div>
 
-    <!-- Nickname -->
     <div class="field">
       <label>Nickname</label>
       <input type="text" id="nickname" placeholder='e.g. "Bot" → Bot 1, Bot 2 …' maxlength="16"/>
     </div>
 
-    <!-- Bot count -->
     <div class="field">
       <label>Number of Bots — <span id="countLabel">5</span></label>
       <div class="range-row">
@@ -368,15 +394,24 @@
       <span class="btn-text">🚀 Launch Bots</span>
     </button>
 
-    <!-- Session status -->
+    <!-- Active session -->
     <div class="session-bar" id="sessionBar">
-      <div class="dot"></div>
+      <div class="dot" id="sessionDot"></div>
       <span class="session-text" id="sessionText">Bots active</span>
       <span class="session-timer" id="sessionTimer">15:00</span>
       <button class="btn-stop" onclick="stopSession()">Stop</button>
     </div>
 
-    <!-- Log -->
+    <!-- Failure banner -->
+    <div class="fail-bar" id="failBar">
+      <span class="fail-icon">⚠️</span>
+      <div class="fail-body">
+        <div class="fail-title">Job Failed</div>
+        <div class="fail-reason" id="failReason">Unknown error</div>
+      </div>
+      <button class="btn-dismiss" onclick="dismissFail()" title="Dismiss">✕</button>
+    </div>
+
     <div class="log-box" id="logBox"></div>
   </div>
 
@@ -384,20 +419,18 @@
 </div>
 
 <script>
-  // Hardcoded server URL
   const SERVER_URL = 'https://dedicator-cloak-doorbell.ngrok-free.dev';
 
-  // Sync range display
   const range = document.getElementById('botCount');
   const rangeDisplay = document.getElementById('rangeDisplay');
   range.addEventListener('input', () => rangeDisplay.textContent = range.value);
 
-  // Logging
+  // ── Logging ──────────────────────────────────────────────────────────────────
+
   function log(msg, type = 'info') {
     const box = document.getElementById('logBox');
     box.classList.add('visible');
-    const now = new Date();
-    const t = now.toTimeString().slice(0,8);
+    const t = new Date().toTimeString().slice(0, 8);
     const line = document.createElement('div');
     line.className = 'log-line';
     line.innerHTML = `<span class="log-time">${t}</span><span class="log-msg ${type}">${msg}</span>`;
@@ -405,9 +438,11 @@
     box.scrollTop = box.scrollHeight;
   }
 
-  // Session timer
+  // ── Timer ─────────────────────────────────────────────────────────────────────
+
   let timerInterval = null;
-  let sessionId = null;
+  let jobId = null;
+  let pollInterval = null;
 
   function startTimer(seconds) {
     let remaining = seconds;
@@ -420,45 +455,104 @@
       el.textContent = `${m}:${s}`;
       if (remaining <= 0) {
         clearInterval(timerInterval);
-        endSession();
+        endSession('timeout');
       }
     }, 1000);
   }
 
-  function endSession() {
+  // ── Failure polling ───────────────────────────────────────────────────────────
+
+  function startPolling(id) {
+    stopPolling();
+    pollInterval = setInterval(async () => {
+      try {
+        const res = await fetch(`${SERVER_URL}/status/${id}`);
+        const data = await res.json();
+
+        if (data.status === 'failed') {
+          stopPolling();
+          showFailure(data.reason || 'The job failed on the AHK side.');
+          endSession('failed');
+        } else if (data.status === 'completed') {
+          stopPolling();
+          endSession('completed');
+        }
+      } catch (_) {
+        // server unreachable mid-session, keep trying
+      }
+    }, 3000); // poll every 3 seconds
+  }
+
+  function stopPolling() {
+    if (pollInterval) {
+      clearInterval(pollInterval);
+      pollInterval = null;
+    }
+  }
+
+  // ── Failure UI ────────────────────────────────────────────────────────────────
+
+  function showFailure(reason) {
+    document.getElementById('failReason').textContent = reason;
+    document.getElementById('failBar').classList.add('visible');
+    document.getElementById('card').classList.add('failed');
+    log(`Job failed: ${reason}`, 'err');
+  }
+
+  function dismissFail() {
+    document.getElementById('failBar').classList.remove('visible');
+    document.getElementById('card').classList.remove('failed');
+  }
+
+  // ── Session lifecycle ─────────────────────────────────────────────────────────
+
+  function endSession(reason = 'timeout') {
+    clearInterval(timerInterval);
+    stopPolling();
+
     document.getElementById('sessionBar').classList.remove('visible');
     document.getElementById('launchBtn').disabled = false;
-    sessionId = null;
-    log('Session ended — all tabs closed by server.', 'warn');
+    jobId = null;
+
+    if (reason === 'timeout') {
+      log('Session ended — all tabs closed by server.', 'warn');
+    } else if (reason === 'stopped') {
+      log('Session stopped manually.', 'warn');
+    } else if (reason === 'completed') {
+      log('Session completed successfully.', 'ok');
+    }
+    // 'failed' case is logged by showFailure()
   }
 
   async function stopSession() {
-    if (!sessionId) return;
-    
+    if (!jobId) return;
     try {
       await fetch(`${SERVER_URL}/stop`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sessionId })
+        body: JSON.stringify({ jobId })
       });
       log('Stop request sent.', 'warn');
-    } catch(e) {
+    } catch (e) {
       log('Could not reach server to stop.', 'err');
     }
-    clearInterval(timerInterval);
-    endSession();
+    endSession('stopped');
   }
 
-  async function launch() {
-    const pin    = document.getElementById('gamePin').value.trim();
-    const name   = document.getElementById('nickname').value.trim();
-    const count  = parseInt(document.getElementById('botCount').value);
+  // ── Launch ────────────────────────────────────────────────────────────────────
 
-    if (!pin)    { log('Please enter a game PIN.', 'err'); return; }
-    if (!name)   { log('Please enter a nickname.', 'err'); return; }
+  async function launch() {
+    dismissFail();
+
+    const pin   = document.getElementById('gamePin').value.trim();
+    const name  = document.getElementById('nickname').value.trim();
+    const count = parseInt(document.getElementById('botCount').value);
+
+    if (!pin)  { log('Please enter a game PIN.', 'err'); return; }
+    if (!name) { log('Please enter a nickname.', 'err'); return; }
 
     document.getElementById('launchBtn').disabled = true;
-    log(`Connecting to server…`, 'info');
+    log('Connecting to server…', 'info');
 
     try {
       const res = await fetch(`${SERVER_URL}/launch`, {
@@ -475,16 +569,18 @@
         return;
       }
 
-      sessionId = data.sessionId;
-      log(`Session started: ${sessionId}`, 'ok');
+      jobId = data.jobId; // ← uses jobId now, matching the server
+      log(`Job queued: #${jobId}`, 'ok');
       log(`Launching ${count} bot(s) as "${name} 1" … "${name} ${count}"`, 'ok');
 
       document.getElementById('sessionText').textContent =
         `${count} bot(s) active as "${name} 1–${count}"`;
       document.getElementById('sessionBar').classList.add('visible');
-      startTimer(data.durationSeconds || 900);
 
-    } catch(e) {
+      startTimer(data.durationSeconds || 900);
+      startPolling(jobId); // ← start watching for failures
+
+    } catch (e) {
       log(`Could not reach server: ${e.message}`, 'err');
       log('Is the server running? Is the tunnel URL correct?', 'warn');
       document.getElementById('launchBtn').disabled = false;
