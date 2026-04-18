@@ -542,13 +542,13 @@
 
   async function stopSession() {
     if (!jobId) return;
-    // End the session on the frontend immediately — don't wait for poll
+    const idToStop = jobId; // capture before endSession nulls it
     endSession('stopped');
     try {
       await fetch(`${SERVER_URL}/stop`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ jobId })
+        body: JSON.stringify({ jobId: idToStop })
       });
     } catch (e) {
       // Server unreachable — session already ended on frontend, nothing to do
