@@ -488,6 +488,9 @@
                   showFailure(data.reason || 'The job failed on the server side.');
                   endSession('failed');
                 }
+              } else if (data.status === 'completed') {
+                  log(data.reason || 'All bots spawned successfully.', 'ok');
+                  // keep polling — user may still hit Stop during the 15 min window
               }
           } catch (_) {
               // server unreachable, keep trying
