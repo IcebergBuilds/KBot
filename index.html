@@ -479,13 +479,15 @@
               }
 
               if (data.status === 'failed') {
-                  stopPolling();
+                stopPolling();
+                const wasManual = data.reason?.includes('stopped by user');
+                if (wasManual) {
+                  log('Session stopped — bots closed.', 'warn');
+                  endSession('stopped');
+                } else {
                   showFailure(data.reason || 'The job failed on the server side.');
                   endSession('failed');
-              } else if (data.status === 'completed') {
-                  stopPolling();
-                  log(data.reason || 'All bots spawned successfully.', 'ok');
-                  endSession('completed');
+                }
               }
           } catch (_) {
               // server unreachable, keep trying
@@ -542,11 +544,13 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ jobId })
       });
-      log('Stop request sent.', 'warn');
+      log('Stop signal sent — waiting for confirmation…', 'warn');
+      // Don't call endSession here — let the poll loop handle it
+      // when AHK reports back "failed" with reason "Job was stopped by user"
     } catch (e) {
       log('Could not reach server to stop.', 'err');
+      endSession('stopped'); // fallback only if server is unreachable
     }
-    endSession('stopped');
   }
 
   // ── Launch ────────────────────────────────────────────────────────────────────
