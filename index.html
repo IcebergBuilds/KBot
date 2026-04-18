@@ -462,43 +462,43 @@
 
   // ── Failure polling ───────────────────────────────────────────────────────────
 
-function startPolling(id) {
-    stopPolling();
-    let seenLogs = 0;
-    let seenCompleted = false;  // ← add this
+  function startPolling(id) {
+      stopPolling();
+      let seenLogs = 0;
+      let seenCompleted = false;  // ← add this
 
-    pollInterval = setInterval(async () => {
-        try {
-            const res = await fetch(`${SERVER_URL}/status/${id}`);
-            const data = await res.json();
+      pollInterval = setInterval(async () => {
+          try {
+              const res = await fetch(`${SERVER_URL}/status/${id}`);
+              const data = await res.json();
 
-            if (data.logs && data.logs.length > seenLogs) {
-                const newLogs = data.logs.slice(seenLogs);
-                newLogs.forEach(entry => log(entry.reason, 'info'));
-                seenLogs = data.logs.length;
-            }
+              if (data.logs && data.logs.length > seenLogs) {
+                  const newLogs = data.logs.slice(seenLogs);
+                  newLogs.forEach(entry => log(entry.reason, 'info'));
+                  seenLogs = data.logs.length;
+              }
 
-            if (data.status === 'failed') {
-                stopPolling();
-                const wasManual = data.reason?.includes('stopped by user');
-                if (wasManual) {
-                    log('Session stopped — bots closed.', 'warn');
-                    endSession('stopped');
-                } else {
-                    showFailure(data.reason || 'The job failed on the server side.');
-                    endSession('failed');
-                }
-            } else if (data.status === 'completed' && !seenCompleted) {  // ← guard
-                seenCompleted = true;
-                log(data.reason || 'All bots spawned successfully.', 'ok');
-                // keep polling — user may still hit Stop during the 15 min window
-            }
-        } catch (_) {
-            // server unreachable, keep trying
-        }
-    }, 1000);
-}
-  
+              if (data.status === 'failed') {
+                  stopPolling();
+                  const wasManual = data.reason?.includes('stopped by user');
+                  if (wasManual) {
+                      log('Session stopped — bots closed.', 'warn');
+                      endSession('stopped');
+                  } else {
+                      showFailure(data.reason || 'The job failed on the server side.');
+                      endSession('failed');
+                  }
+              } else if (data.status === 'completed' && !seenCompleted) {  // ← guard
+                  seenCompleted = true;
+                  log(data.reason || 'All bots spawned successfully.', 'ok');
+                  // keep polling — user may still hit Stop during the 15 min window
+              }
+          } catch (_) {
+              // server unreachable, keep trying
+          }
+      }, 1000);
+  }
+
   function stopPolling() {
     if (pollInterval) {
       clearInterval(pollInterval);
@@ -542,18 +542,16 @@ function startPolling(id) {
 
   async function stopSession() {
     if (!jobId) return;
+    // End the session on the frontend immediately — don't wait for poll
+    endSession('stopped');
     try {
       await fetch(`${SERVER_URL}/stop`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ jobId })
       });
-      log('Stop signal sent — waiting for confirmation…', 'warn');
-      // Don't call endSession here — let the poll loop handle it
-      // when AHK reports back "failed" with reason "Job was stopped by user"
     } catch (e) {
-      log('Could not reach server to stop.', 'err');
-      endSession('stopped'); // fallback only if server is unreachable
+      // Server unreachable — session already ended on frontend, nothing to do
     }
   }
 
