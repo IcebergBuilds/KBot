@@ -484,12 +484,13 @@
                   endSession('failed');
               } else if (data.status === 'completed') {
                   stopPolling();
+                  log(data.reason || 'All bots spawned successfully.', 'ok');
                   endSession('completed');
               }
           } catch (_) {
               // server unreachable, keep trying
           }
-      }, 3000);
+      }, 1000);
   }
 
   function stopPolling() {
@@ -595,6 +596,14 @@
       document.getElementById('launchBtn').disabled = false;
     }
   }
+
+  // ── Auto-stop on page close ───────────────────────────────────────────────
+
+  window.addEventListener('beforeunload', () => {
+    if (!jobId) return;
+    const payload = JSON.stringify({ jobId });
+    navigator.sendBeacon(`${SERVER_URL}/stop`, new Blob([payload], { type: 'application/json' }));
+  });
 </script>
 </body>
 </html>
