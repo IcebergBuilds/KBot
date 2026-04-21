@@ -361,6 +361,158 @@
     .log-box::-webkit-scrollbar { width: 4px; }
     .log-box::-webkit-scrollbar-track { background: transparent; }
     .log-box::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+
+    /* ── Settings ── */
+    .btn-settings {
+      width: 100%; padding: 0.55rem;
+      background: transparent;
+      border: 1px solid var(--border); border-radius: 8px;
+      color: var(--muted); font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem; letter-spacing: 1px; text-transform: uppercase;
+      cursor: pointer; margin-top: 0.6rem;
+      transition: border-color 0.2s, color 0.2s;
+      display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+    }
+    .btn-settings:hover { border-color: var(--accent); color: var(--text); }
+
+    .settings-panel {
+      display: none; flex-direction: column; gap: 0.75rem;
+      margin-top: 0.75rem; padding: 1rem;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border); border-radius: 10px;
+    }
+    .settings-panel.visible { display: flex; }
+    .settings-title {
+      font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 0.25rem;
+    }
+
+    .toggle-row {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      gap: 1rem;
+    }
+    .toggle-label { flex: 1; }
+    .toggle-label strong { display: block; font-size: 0.8rem; color: var(--text); margin-bottom: 0.2rem; }
+    .toggle-label span   { font-size: 0.68rem; color: var(--muted); line-height: 1.5; }
+
+    /* Toggle switch */
+    .toggle { position: relative; width: 40px; height: 22px; flex-shrink: 0; margin-top: 2px; }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute; inset: 0; cursor: pointer;
+      background: var(--border); border-radius: 22px;
+      transition: background 0.2s;
+    }
+    .toggle-slider::before {
+      content: ''; position: absolute;
+      width: 16px; height: 16px; border-radius: 50%;
+      left: 3px; top: 3px; background: #fff;
+      transition: transform 0.2s;
+    }
+    .toggle input:checked + .toggle-slider { background: var(--accent); }
+    .toggle input:checked + .toggle-slider::before { transform: translateX(18px); }
+
+    .settings-warn {
+      font-size: 0.68rem; color: var(--warn);
+      padding: 0.5rem 0.6rem;
+      background: rgba(245,158,11,0.08);
+      border: 1px solid rgba(245,158,11,0.2);
+      border-radius: 6px; display: none; line-height: 1.5;
+    }
+    .settings-warn.visible { display: block; }
+
+    /* ── Colour prompt ── */
+    .colour-bar {
+      display: none;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-top: 1.2rem;
+      padding: 1rem;
+      background: rgba(124,58,237,0.08);
+      border: 1px solid rgba(124,58,237,0.35);
+      border-radius: 10px;
+      animation: fadeIn 0.3s ease;
+    }
+    .colour-bar.visible { display: flex; }
+    .colour-title { color: var(--accent2); font-weight: 600; font-size: 0.85rem; }
+    .colour-desc  { color: var(--muted); font-size: 0.72rem; line-height: 1.6; }
+
+    /* The 4 big colour buttons — same layout as real Kahoot */
+    .colour-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+    }
+    .btn-colour {
+      border: none; border-radius: 10px;
+      padding: 1rem 0.5rem;
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem; font-weight: 700;
+      color: #fff; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+      transition: transform 0.1s, opacity 0.2s;
+      position: relative;
+    }
+    .btn-colour:hover  { opacity: 0.9; transform: scale(1.03); }
+    .btn-colour:active { transform: scale(0.97); }
+    .btn-colour.selected::after {
+      content: '';
+      position: absolute;
+      inset: -3px;
+      border-radius: 12px;
+      border: 3px solid #fff;
+      pointer-events: none;
+    }
+    .btn-colour[data-c="red"]    { background: #e21b3c; }
+    .btn-colour[data-c="blue"]   { background: #1368ce; }
+    .btn-colour[data-c="yellow"] { background: #d89e00; }
+    .btn-colour[data-c="green"]  { background: #26890c; }
+
+    /* The selected sequence shown as small swatches */
+    .colour-sequence {
+      display: flex; gap: 0.4rem; align-items: center; min-height: 28px;
+      flex-wrap: wrap;
+    }
+    .colour-swatch {
+      width: 28px; height: 28px; border-radius: 6px;
+      border: 2px solid rgba(255,255,255,0.2);
+      cursor: pointer; transition: transform 0.1s;
+      position: relative;
+    }
+    .colour-swatch:hover::after {
+      content: '✕';
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.7rem; color: #fff;
+      background: rgba(0,0,0,0.4); border-radius: 4px;
+    }
+    .colour-swatch[data-c="red"]    { background: #e21b3c; }
+    .colour-swatch[data-c="yellow"] { background: #d89e00; }
+    .colour-swatch[data-c="blue"]   { background: #1368ce; }
+    .colour-swatch[data-c="green"]  { background: #26890c; }
+    .colour-seq-label { color: var(--muted); font-size: 0.7rem; }
+
+    .colour-actions { display: flex; gap: 0.5rem; }
+    .btn-colour-submit {
+      flex: 1;
+      background: linear-gradient(135deg, var(--accent), #5b21b6);
+      border: none; border-radius: 8px;
+      color: #fff; font-family: 'Syne', sans-serif;
+      font-size: 0.85rem; font-weight: 700;
+      padding: 0.6rem 1rem; cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .btn-colour-submit:disabled { opacity: 0.35; cursor: not-allowed; }
+    .btn-colour-submit:not(:disabled):hover { opacity: 0.85; }
+    .btn-colour-clear {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border); border-radius: 8px;
+      color: var(--muted); font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem; padding: 0.6rem 0.75rem; cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-colour-clear:hover { background: rgba(255,255,255,0.1); }
+    .colour-error { color: var(--error); font-size: 0.7rem; min-height: 1em; }
   </style>
 </head>
 <body>
@@ -394,6 +546,40 @@
       <span class="btn-text">🚀 Launch Bots</span>
     </button>
 
+    <button class="btn-settings" onclick="toggleSettings()">
+      <span id="settingsArrow">▸</span> Settings
+    </button>
+
+    <div class="settings-panel" id="settingsPanel">
+      <div class="settings-title">Game Options</div>
+
+      <div class="toggle-row">
+        <div class="toggle-label">
+          <strong>Nickname Generator</strong>
+          <span>Kahoot generates a random name for each bot.<br>Bots spawn one at a time so names don't clash.</span>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="settingNicknameGen" onchange="onSettingsChange()"/>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="toggle-row">
+        <div class="toggle-label">
+          <strong>Two-Step Colour Code</strong>
+          <span>Host enabled identity verification. You'll be prompted to click the 4 colours shown on screen.</span>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="settingTwoStep" onchange="onSettingsChange()"/>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="settings-warn" id="settingsWarn">
+        ⚡ Nickname Generator is on — bots spawn one at a time and will be slower.
+      </div>
+    </div>
+
     <!-- Active session -->
     <div class="session-bar" id="sessionBar">
       <div class="dot" id="sessionDot"></div>
@@ -410,6 +596,26 @@
         <div class="fail-reason" id="failReason">Unknown error</div>
       </div>
       <button class="btn-dismiss" onclick="dismissFail()" title="Dismiss">✕</button>
+    </div>
+
+    <!-- Colour code prompt -->
+    <div class="colour-bar" id="colourBar">
+      <div class="colour-title">🎨 Two-Step Verification — click the 4 colours in order</div>
+      <div class="colour-desc">Match the pattern shown on the Kahoot screen.</div>
+      <div class="colour-grid">
+        <button class="btn-colour" data-c="red"    onclick="pickColour('red')"   >▲ Triangle</button>
+        <button class="btn-colour" data-c="blue"   onclick="pickColour('blue')"  >◆ Diamond</button>
+        <button class="btn-colour" data-c="yellow" onclick="pickColour('yellow')">● Circle</button>
+        <button class="btn-colour" data-c="green"  onclick="pickColour('green')" >■ Square</button>
+      </div>
+      <div class="colour-sequence" id="colourSequence">
+        <span class="colour-seq-label" id="colourSeqLabel">Click 4 colours above…</span>
+      </div>
+      <div class="colour-actions">
+        <button class="btn-colour-clear" onclick="clearColours()">Clear</button>
+        <button class="btn-colour-submit" id="colourSubmitBtn" onclick="submitColour()" disabled>Submit</button>
+      </div>
+      <div class="colour-error" id="colourError"></div>
     </div>
 
     <div class="log-box" id="logBox"></div>
@@ -480,6 +686,7 @@
 
               if (data.status === 'failed') {
                   stopPolling();
+                  hideColourPrompt();
                   const wasManual = data.reason?.includes('stopped by user');
                   if (wasManual) {
                       log('Session stopped — bots closed.', 'warn');
@@ -488,10 +695,14 @@
                       showFailure(data.reason || 'The job failed on the server side.');
                       endSession('failed');
                   }
-              } else if (data.status === 'completed' && !seenCompleted) {  // ← guard
+              } else if (data.status === 'needs-colour') {
+                  if (!document.getElementById('colourBar').classList.contains('visible')) {
+                      showColourPrompt();
+                  }
+              } else if (data.status === 'completed' && !seenCompleted) {
                   seenCompleted = true;
+                  hideColourPrompt();
                   log(data.reason || 'All bots spawned successfully.', 'ok');
-                  // keep polling — user may still hit Stop during the 15 min window
               }
           } catch (_) {
               // server unreachable, keep trying
@@ -557,12 +768,36 @@
 
   // ── Launch ────────────────────────────────────────────────────────────────────
 
+  // ── Settings ──────────────────────────────────────────────────────────────────
+
+  function toggleSettings() {
+    const panel = document.getElementById('settingsPanel');
+    const arrow = document.getElementById('settingsArrow');
+    const open  = panel.classList.toggle('visible');
+    arrow.textContent = open ? '▾' : '▸';
+  }
+
+  function onSettingsChange() {
+    const genOn = document.getElementById('settingNicknameGen').checked;
+    document.getElementById('settingsWarn').classList.toggle('visible', genOn);
+  }
+
+  function getSettings() {
+    return {
+      nicknameGenerator: document.getElementById('settingNicknameGen').checked,
+      twoStep:           document.getElementById('settingTwoStep').checked,
+    };
+  }
+
+  // ── Launch ────────────────────────────────────────────────────────────────────
+
   async function launch() {
     dismissFail();
 
-    const pin   = document.getElementById('gamePin').value.trim();
-    const name  = document.getElementById('nickname').value.trim();
-    const count = parseInt(document.getElementById('botCount').value);
+    const pin      = document.getElementById('gamePin').value.trim();
+    const name     = document.getElementById('nickname').value.trim();
+    const count    = parseInt(document.getElementById('botCount').value);
+    const settings = getSettings();
 
     if (!pin)  { log('Please enter a game PIN.', 'err'); return; }
     if (!name) { log('Please enter a nickname.', 'err'); return; }
@@ -570,11 +805,16 @@
     document.getElementById('launchBtn').disabled = true;
     log('Connecting to server…', 'info');
 
+    if (settings.nicknameGenerator)
+      log('Nickname generator ON — bots will spawn one at a time.', 'warn');
+    if (settings.twoStep)
+      log('Two-step colour code ON — watch for the colour prompt.', 'warn');
+
     try {
       const res = await fetch(`${SERVER_URL}/launch`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pin, nickname: name, count })
+        body: JSON.stringify({ pin, nickname: name, count, settings })
       });
 
       const data = await res.json();
@@ -600,6 +840,86 @@
       log(`Could not reach server: ${e.message}`, 'err');
       log('The server is not currently active. Come back later.', 'warn');
       document.getElementById('launchBtn').disabled = false;
+    }
+  }
+
+  // ── Colour code prompt ───────────────────────────────────────────────────────
+
+  let colourSequence = [];
+
+  function showColourPrompt() {
+    colourSequence = [];
+    renderSequence();
+    document.getElementById('colourBar').classList.add('visible');
+    document.getElementById('colourError').textContent = '';
+    log('🎨 Two-step verification required — click the 4 colours above.', 'warn');
+  }
+
+  function hideColourPrompt() {
+    document.getElementById('colourBar').classList.remove('visible');
+    colourSequence = [];
+    renderSequence();
+    document.getElementById('colourError').textContent = '';
+  }
+
+  function pickColour(colour) {
+    if (colourSequence.length >= 4) return;
+    colourSequence.push(colour);
+    renderSequence();
+  }
+
+  function clearColours() {
+    colourSequence = [];
+    renderSequence();
+    document.getElementById('colourError').textContent = '';
+  }
+
+  function renderSequence() {
+    const seq   = document.getElementById('colourSequence');
+    const label = document.getElementById('colourSeqLabel');
+    const btn   = document.getElementById('colourSubmitBtn');
+
+    seq.innerHTML = '';
+
+    if (colourSequence.length === 0) {
+      seq.appendChild(Object.assign(document.createElement('span'), {
+        className: 'colour-seq-label', textContent: 'Click 4 colours above…'
+      }));
+      btn.disabled = true;
+      return;
+    }
+
+    colourSequence.forEach((c, i) => {
+      const swatch = document.createElement('div');
+      swatch.className = 'colour-swatch';
+      swatch.setAttribute('data-c', c);
+      swatch.title = `${i + 1}. ${c} — click to remove`;
+      swatch.onclick = () => { colourSequence.splice(i, 1); renderSequence(); };
+      seq.appendChild(swatch);
+    });
+
+    if (colourSequence.length < 4) {
+      const remaining = document.createElement('span');
+      remaining.className = 'colour-seq-label';
+      remaining.textContent = `${4 - colourSequence.length} more…`;
+      seq.appendChild(remaining);
+    }
+
+    btn.disabled = colourSequence.length < 4;
+  }
+
+  async function submitColour() {
+    if (colourSequence.length !== 4) return;
+    try {
+      await fetch(`${SERVER_URL}/colour-submit`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jobId, code: colourSequence.join(',') })
+      });
+      log(`Colour code submitted: ${colourSequence.join(', ')}`, 'info');
+      hideColourPrompt();
+    } catch (e) {
+      document.getElementById('colourError').textContent = 'Could not reach server.';
     }
   }
 
